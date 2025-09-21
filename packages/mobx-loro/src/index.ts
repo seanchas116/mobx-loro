@@ -3,10 +3,13 @@ export { ObservableLoroList } from "./list";
 export { ObservableLoroMap } from "./map";
 export { ObservableLoroTree, ObservableLoroTreeNode } from "./tree";
 export { ObservableLoroText } from "./text";
-export { ObservableLoroPool } from "./pool";
 
 // Export type transformations
-export type { ToObservable, ToObservableRecord } from "./types";
+export type {
+  ToObservable,
+  ToObservableArray,
+  ToObservableRecord,
+} from "./types";
 
 // Export utility functions for easier API
 export {

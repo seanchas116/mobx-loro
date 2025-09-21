@@ -34,8 +34,8 @@ pnpm lint            # Run ESLint on src directory
 
 ```bash
 cd packages/mobx-loro
-pnpm vitest run src/observable-loro-map.test.ts  # Run specific test file
-pnpm vitest watch src/observable-loro-map.test.ts # Watch mode for specific test
+pnpm vitest run src/map.test.ts  # Run specific test file
+pnpm vitest watch src/map.test.ts # Watch mode for specific test
 ```
 
 ## Architecture
@@ -50,16 +50,36 @@ The library uses a **flyweight pattern** via `ObservableLoroPool` to ensure:
 
 **Critical Rule**: All observable wrappers MUST be created through `ObservableLoroPool`. Direct instantiation is blocked via TypeScript's branded types using `OBSERVABLE_LORO_INTERNAL_CREATE` symbol.
 
+### Public API
+
+The library exports:
+
+1. **Observable Wrapper Classes** (for type annotations):
+   - `ObservableLoroMap`, `ObservableLoroList`, `ObservableLoroTree`
+   - `ObservableMovableList`, `ObservableLoroText`, `ObservableLoroTreeNode`
+
+2. **Type Transformation Utilities**:
+   - `ToObservable<T>`: Transforms Loro container types to observable equivalents
+   - `ToObservableArray<T>`: Maps array element types through ToObservable
+   - `ToObservableRecord<T>`: Maps record value types through ToObservable
+
+3. **Utility Functions** (primary API):
+   - `getMap(doc, key)`, `getList(doc, key)`, `getTree(doc, key)`
+   - `getMovableList(doc, key)`, `getText(doc, key)`
+   - `toObservable(container)`: Wrap any container
+   - `disposePool(doc)`: Clean up resources
+
+Note: `ObservableLoroPool` is intentionally not exported. Use utility functions for automatic pool management.
+
 ### Observable Wrapper Classes
 
 Each Loro container type has a corresponding observable wrapper:
 
-1. **ObservableLoroDoc**: Wraps LoroDoc, provides transaction support
-2. **ObservableLoroMap**: Map-like API with MobX reactivity
-3. **ObservableLoroList**: Array-like API with index-based operations
-4. **ObservableLoroTree**: Hierarchical data with node management
-5. **ObservableMovableList**: List with move operations for reordering
-6. **ObservableLoroText**: Collaborative text editing operations
+1. **ObservableLoroMap**: Map-like API with MobX reactivity
+2. **ObservableLoroList**: Array-like API with index-based operations
+3. **ObservableLoroTree**: Hierarchical data with node management
+4. **ObservableMovableList**: List with move operations for reordering
+5. **ObservableLoroText**: Collaborative text editing operations
 
 ### Key Implementation Details
 
@@ -68,11 +88,12 @@ Each Loro container type has a corresponding observable wrapper:
    - Updates MobX atoms via `reportChanged()`
    - Proxies operations to underlying Loro container
 
-2. **Nested Container Access**: When accessing nested containers (e.g., `map.get("nested")` returns another container), the wrapper automatically returns the appropriate observable wrapper from the pool.
+2. **Nested Container Access**: When accessing nested containers (e.g., `map.get("nested")` returns another container), the wrapper automatically returns the appropriate observable wrapper from the pool using `pool.get()`.
 
 3. **TreeNode Special Handling**: `ObservableLoroTreeNode` wraps individual tree nodes and maintains stable instances through the pool's node cache.
 
-4. **Transaction Support**: `ObservableLoroDoc.withTransaction()` ensures atomic updates across multiple operations.
+4. **Type Transformations**: The type metafunctions (`ToObservable`, `ToObservableArray`, `ToObservableRecord`) automatically transform Loro container types in schemas to their observable counterparts, supporting nested structures.
+
 
 ## Testing Strategy
 
