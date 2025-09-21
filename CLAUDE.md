@@ -162,5 +162,6 @@ To release a new version of the package:
 
 ### Version History
 
+- **v0.0.3** - Add automatic type inference for utility functions from LoroDoc schemas
 - **v0.0.2** - Include README.md in npm package
 - **v0.0.1** - Initial release with MobX-Loro reactive wrappers
