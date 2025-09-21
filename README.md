@@ -84,12 +84,13 @@ const TodoList = observer(({ doc }: { doc: LoroDoc }) => {
 
 ## Type Safety
 
-The library automatically transforms container types:
+The library provides automatic type inference from your schema:
 
 ```typescript
 import { LoroDoc, LoroMap, LoroList } from "loro-crdt";
 import { getList, getMap } from "@seanchas116/mobx-loro";
 
+// Define your document schema
 type Schema = {
   metadata: LoroMap<{ lastModified: number }>;
   todos: LoroList<LoroMap<{ title: string; done: boolean }>>;
@@ -97,12 +98,14 @@ type Schema = {
 
 const doc = new LoroDoc<Schema>();
 
+// Types are automatically inferred from the schema
 const metadata = getMap(doc, "metadata");
 // Type: ObservableLoroMap<{ lastModified: number }>
 
 const todos = getList(doc, "todos");
-// Type: ObservableLoroList<LoroMap<...>>
+// Type: ObservableLoroList<LoroMap<{ title: string; done: boolean }>>
 
+// Nested containers are also properly typed
 const firstTodo = todos.get(0);
 // Type: ObservableLoroMap<{ title: string; done: boolean }>
 ```

@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { LoroDoc, LoroMap } from "loro-crdt";
+import {
+  LoroDoc,
+  LoroMap,
+  LoroList,
+  LoroTree,
+  LoroMovableList,
+  LoroText,
+} from "loro-crdt";
 import { reaction } from "mobx";
 import {
   getMap,
@@ -12,8 +19,27 @@ import {
 import { ObservableLoroMap } from "./map";
 import { ObservableLoroList } from "./list";
 
+// Define test schemas for type safety
+type TestSchema = {
+  "test-map": LoroMap<Record<string, unknown>>;
+  "my-map": LoroMap<Record<string, unknown>>;
+  "my-list": LoroList<unknown>;
+  "my-tree": LoroTree<Record<string, unknown>>;
+  "my-movable": LoroMovableList<unknown>;
+  "my-text": LoroText;
+  "reactive-map": LoroMap<{ count: number }>;
+  "list-with-maps": LoroList<LoroMap<{ name: string }>>;
+  map: LoroMap<Record<string, unknown>>;
+  map1: LoroMap<Record<string, unknown>>;
+  map2: LoroMap<Record<string, unknown>>;
+  list: LoroList<unknown>;
+  test: LoroMap<Record<string, unknown>>;
+  users: LoroMap<{ name: string; age: number }>;
+  posts: LoroList<string>;
+};
+
 describe("Utility functions with WeakMap pool management", () => {
-  let doc: LoroDoc;
+  let doc: LoroDoc<TestSchema>;
 
   beforeEach(() => {
     doc = new LoroDoc();
@@ -50,7 +76,7 @@ describe("Utility functions with WeakMap pool management", () => {
   });
 
   it("should maintain reactivity", () => {
-    const map = getMap<{ count: number }>(doc, "reactive-map");
+    const map = getMap(doc, "reactive-map");
 
     let observedCount: number | undefined;
     const dispose = reaction(
@@ -70,7 +96,7 @@ describe("Utility functions with WeakMap pool management", () => {
   });
 
   it("should handle nested containers", () => {
-    const list = getList<LoroMap<{ name: string }>>(doc, "list-with-maps");
+    const list = getList(doc, "list-with-maps");
     const nestedMap = list.pushContainer(new LoroMap());
 
     expect(nestedMap).toBeInstanceOf(ObservableLoroMap);
@@ -80,7 +106,7 @@ describe("Utility functions with WeakMap pool management", () => {
   });
 
   it("should use different pools for different documents", () => {
-    const doc2 = new LoroDoc();
+    const doc2 = new LoroDoc<TestSchema>();
 
     const map1 = getMap(doc, "map");
     const map2 = getMap(doc2, "map");
@@ -114,8 +140,8 @@ describe("Utility functions with WeakMap pool management", () => {
   });
 
   it("should work with typed schemas", () => {
-    const users = getMap<{ name: string; age: number }>(doc, "users");
-    const posts = getList<string>(doc, "posts");
+    const users = getMap(doc, "users");
+    const posts = getList(doc, "posts");
 
     users.set("name", "Alice");
     users.set("age", 30);

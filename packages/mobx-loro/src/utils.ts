@@ -5,6 +5,7 @@ import {
   LoroTree,
   LoroMovableList,
   LoroText,
+  Container,
 } from "loro-crdt";
 import { ObservableLoroPool } from "./pool";
 import { ObservableLoroMap } from "./map";
@@ -31,54 +32,109 @@ function getPool(doc: LoroDoc): ObservableLoroPool {
 
 /**
  * Get an observable map from a document.
- * Automatically manages the pool internally.
+ * Automatically manages the pool internally and infers types from LoroDoc schema.
  */
 export function getMap<
-  T extends Record<string, unknown> = Record<string, unknown>,
->(doc: LoroDoc, key: string): ObservableLoroMap<T> {
+  Schema extends Record<string, Container>,
+  K extends keyof Schema & string,
+>(
+  doc: LoroDoc<Schema>,
+  key: K,
+): Schema[K] extends LoroMap<infer T> ? ObservableLoroMap<T> : never;
+export function getMap<T extends Record<string, unknown>>(
+  doc: LoroDoc,
+  key: string,
+): ObservableLoroMap<T>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getMap(doc: LoroDoc, key: string): ObservableLoroMap<any> {
   const pool = getPool(doc);
-  return pool.get(doc.getMap(key)) as ObservableLoroMap<T>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return pool.get(doc.getMap(key)) as ObservableLoroMap<any>;
 }
 
 /**
  * Get an observable list from a document.
- * Automatically manages the pool internally.
+ * Automatically manages the pool internally and infers types from LoroDoc schema.
  */
+export function getList<
+  Schema extends Record<string, Container>,
+  K extends keyof Schema & string,
+>(
+  doc: LoroDoc<Schema>,
+  key: K,
+): Schema[K] extends LoroList<infer T> ? ObservableLoroList<T> : never;
 export function getList<T = unknown>(
   doc: LoroDoc,
   key: string,
-): ObservableLoroList<T> {
+): ObservableLoroList<T>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getList(doc: LoroDoc, key: string): ObservableLoroList<any> {
   const pool = getPool(doc);
-  return pool.get(doc.getList(key)) as ObservableLoroList<T>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return pool.get(doc.getList(key)) as ObservableLoroList<any>;
 }
 
 /**
  * Get an observable tree from a document.
- * Automatically manages the pool internally.
+ * Automatically manages the pool internally and infers types from LoroDoc schema.
  */
 export function getTree<
-  T extends Record<string, unknown> = Record<string, unknown>,
->(doc: LoroDoc, key: string): ObservableLoroTree<T> {
+  Schema extends Record<string, Container>,
+  K extends keyof Schema & string,
+>(
+  doc: LoroDoc<Schema>,
+  key: K,
+): Schema[K] extends LoroTree<infer T> ? ObservableLoroTree<T> : never;
+export function getTree<T extends Record<string, unknown>>(
+  doc: LoroDoc,
+  key: string,
+): ObservableLoroTree<T>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getTree(doc: LoroDoc, key: string): ObservableLoroTree<any> {
   const pool = getPool(doc);
-  return pool.get(doc.getTree(key)) as ObservableLoroTree<T>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return pool.get(doc.getTree(key)) as ObservableLoroTree<any>;
 }
 
 /**
  * Get an observable movable list from a document.
- * Automatically manages the pool internally.
+ * Automatically manages the pool internally and infers types from LoroDoc schema.
  */
+export function getMovableList<
+  Schema extends Record<string, Container>,
+  K extends keyof Schema & string,
+>(
+  doc: LoroDoc<Schema>,
+  key: K,
+): Schema[K] extends LoroMovableList<infer T>
+  ? ObservableMovableList<T>
+  : never;
 export function getMovableList<T = unknown>(
   doc: LoroDoc,
   key: string,
-): ObservableMovableList<T> {
+): ObservableMovableList<T>;
+export function getMovableList(
+  doc: LoroDoc,
+  key: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): ObservableMovableList<any> {
   const pool = getPool(doc);
-  return pool.get(doc.getMovableList(key)) as ObservableMovableList<T>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return pool.get(doc.getMovableList(key)) as ObservableMovableList<any>;
 }
 
 /**
  * Get an observable text from a document.
- * Automatically manages the pool internally.
+ * Automatically manages the pool internally and infers types from LoroDoc schema.
  */
+export function getText<
+  Schema extends Record<string, Container>,
+  K extends keyof Schema & string,
+>(
+  doc: LoroDoc<Schema>,
+  key: K,
+): Schema[K] extends LoroText ? ObservableLoroText : never;
+export function getText(doc: LoroDoc, key: string): ObservableLoroText;
 export function getText(doc: LoroDoc, key: string): ObservableLoroText {
   const pool = getPool(doc);
   return pool.get(doc.getText(key)) as ObservableLoroText;

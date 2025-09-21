@@ -94,7 +94,6 @@ Each Loro container type has a corresponding observable wrapper:
 
 4. **Type Transformations**: The type metafunctions (`ToObservable`, `ToObservableArray`, `ToObservableRecord`) automatically transform Loro container types in schemas to their observable counterparts, supporting nested structures.
 
-
 ## Testing Strategy
 
 - Tests use `createTestDoc()` helper from `test-helpers.ts`
@@ -118,3 +117,50 @@ pnpm verify-readme  # Uses typescript-docs-verifier
 ```
 
 Note: `@types/node` is required for console.log in examples.
+
+## Release Process
+
+To release a new version of the package:
+
+1. **Update version** in `packages/mobx-loro/package.json`
+
+   ```bash
+   cd packages/mobx-loro
+   # Edit package.json to bump version
+   ```
+
+2. **Commit version bump**
+
+   ```bash
+   git add -A
+   git commit -m "Release vX.Y.Z
+
+   - Add changelog notes here"
+   ```
+
+3. **Build and test**
+
+   ```bash
+   pnpm build
+   pnpm test
+   ```
+
+4. **Publish to npm**
+
+   ```bash
+   npm publish --access public
+   ```
+
+   Note: The `prepublishOnly` script automatically copies the root README.md to the package directory.
+
+5. **Create and push git tag**
+   ```bash
+   git tag -a vX.Y.Z -m "Release vX.Y.Z - Description"
+   git push origin main
+   git push origin vX.Y.Z
+   ```
+
+### Version History
+
+- **v0.0.2** - Include README.md in npm package
+- **v0.0.1** - Initial release with MobX-Loro reactive wrappers
