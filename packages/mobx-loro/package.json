@@ -1,0 +1,49 @@
+{
+  "name": "@seanchas116/mobx-loro",
+  "version": "0.0.1",
+  "description": "MobX bindings for Loro CRDT",
+  "homepage": "https://github.com/seanchas116/mobx-loro#readme",
+  "bugs": {
+    "url": "https://github.com/seanchas116/mobx-loro/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanchas116/mobx-loro.git"
+  },
+  "license": "MIT",
+  "author": "Ryohei Ikegami <iofg2100@gmail.com>",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "build": "tsc --noEmit && tsup",
+    "prepare": "npm run build",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@tsconfig/recommended": "^1.0.10",
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.1.13",
+    "eslint": "^9.36.0",
+    "globals": "^16.4.0",
+    "loro-crdt": "^1.7.3",
+    "mobx": "^6.13.7",
+    "mobx-react-lite": "^4.1.0",
+    "prettier": "^3.6.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.9.2",
+    "typescript-docs-verifier": "^3.0.1",
+    "typescript-eslint": "^8.43.0",
+    "vitest": "^3.2.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

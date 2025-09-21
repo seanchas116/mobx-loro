@@ -1,0 +1,20 @@
+{
+  "name": "root",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "dev": "turbo run dev",
+    "format": "pnpm prettier --write .",
+    "format:check": "pnpm prettier --check .",
+    "verify-readme": "cd packages/mobx-loro && pnpm typescript-docs-verifier --input-files ../../README.md",
+    "check": "pnpm verify-readme && pnpm format:check && pnpm lint && pnpm test"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.6"
+  },
+  "packageManager": "pnpm@10.17.0"
+}
