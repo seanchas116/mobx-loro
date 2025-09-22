@@ -82,7 +82,7 @@ describe("Utility functions with WeakMap pool management", () => {
     const dispose = reaction(
       () => map.get("count"),
       (count) => {
-        observedCount = count;
+        observedCount = count as number;
       },
     );
 
@@ -119,6 +119,20 @@ describe("Utility functions with WeakMap pool management", () => {
 
     // Clean up
     disposePool(doc2);
+  });
+
+  it("should maintain type inference with typed schema", () => {
+    const users = getMap(doc, "users");
+
+    // This should work with proper type inference
+    users.set("name", "Bob");
+    users.set("age", 25);
+
+    const name: string = users.get("name") as string;
+    const age: number = users.get("age") as number;
+
+    expect(name).toBe("Bob");
+    expect(age).toBe(25);
   });
 
   it("should handle disposePool correctly", () => {
@@ -162,4 +176,130 @@ describe("Utility functions with WeakMap pool management", () => {
     expect(map1.pool).toBe(map2.pool);
     expect(map1.pool).toBe(list.pool);
   });
+
+  describe("LoroDoc without schema", () => {
+    let untypedDoc: LoroDoc;
+
+    beforeEach(() => {
+      untypedDoc = new LoroDoc();
+    });
+
+    afterEach(() => {
+      disposePool(untypedDoc);
+    });
+
+    it("should work with getMap on untyped document", () => {
+      const map = getMap(untypedDoc, "data");
+
+      map.set("name", "test");
+      map.set("count", 42);
+
+      expect(map.get("name")).toBe("test");
+      expect(map.get("count")).toBe(42);
+    });
+
+    it("should work with getList on untyped document", () => {
+      const list = getList(untypedDoc, "items");
+
+      list.push("first");
+      list.push("second");
+
+      expect(list.get(0)).toBe("first");
+      expect(list.get(1)).toBe("second");
+      expect(list.length).toBe(2);
+    });
+
+    it("should work with getTree on untyped document", () => {
+      const tree = getTree(untypedDoc, "hierarchy");
+      const root = tree.createNode();
+
+      root.data.set("label", "root");
+      expect(root.data.get("label")).toBe("root");
+    });
+
+    it("should work with getMovableList on untyped document", () => {
+      const movable = getMovableList(untypedDoc, "ordered");
+
+      movable.push(1);
+      movable.push(2);
+      movable.push(3);
+
+      expect(movable.get(0)).toBe(1);
+      expect(movable.length).toBe(3);
+    });
+
+    it("should work with getText on untyped document", () => {
+      const text = getText(untypedDoc, "content");
+
+      text.insert(0, "Hello ");
+      text.insert(6, "World");
+
+      expect(text.toString()).toBe("Hello World");
+    });
+
+    it("should maintain reactivity with untyped documents", () => {
+      const map = getMap(untypedDoc, "reactive");
+
+      let observedValue: number | undefined;
+      const dispose = reaction(
+        () => map.get("value"),
+        (value) => {
+          observedValue = value as number;
+        },
+      );
+
+      map.set("value", 10);
+      expect(observedValue).toBe(10);
+
+      map.set("value", 20);
+      expect(observedValue).toBe(20);
+
+      dispose();
+    });
+
+    it("should handle nested containers in untyped documents", () => {
+      const parent = getMap(untypedDoc, "parent");
+      const childList = parent.setContainer("child", new LoroList());
+
+      expect(childList).toBeInstanceOf(ObservableLoroList);
+
+      childList.push("nested item");
+      expect(childList.get(0)).toBe("nested item");
+    });
+
+    it("should use same pool for typed and untyped access", () => {
+      // First access with type
+      const typedMap = getMap(untypedDoc, "shared");
+      typedMap.set("x", 100);
+
+      // Second access without specific type
+      const untypedMap = getMap(untypedDoc, "shared");
+
+      // Should be the same instance
+      expect(typedMap).toBe(untypedMap);
+      expect(untypedMap.get("x")).toBe(100);
+    });
+  });
 });
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function typeTests() {
+  const typedDoc = new LoroDoc<TestSchema>();
+
+  // These should work - correct types
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const users = getMap(typedDoc, "users") satisfies ObservableLoroMap<{
+    name: string;
+    age: number;
+  }>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const posts = getList(typedDoc, "posts") satisfies ObservableLoroList<string>;
+
+  // These result in untyped containers
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const wrongMap = getMap(typedDoc, "posts");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const wrongList = getList(typedDoc, "users");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const wrongText = getText(typedDoc, "users");
+}

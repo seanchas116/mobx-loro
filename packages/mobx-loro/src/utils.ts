@@ -6,6 +6,7 @@ import {
   LoroMovableList,
   LoroText,
   Container,
+  ContainerID,
 } from "loro-crdt";
 import { ObservableLoroPool } from "./pool";
 import { ObservableLoroMap } from "./map";
@@ -36,20 +37,16 @@ function getPool(doc: LoroDoc): ObservableLoroPool {
  */
 export function getMap<
   Schema extends Record<string, Container>,
-  K extends keyof Schema & string,
+  K extends keyof Schema | ContainerID,
 >(
   doc: LoroDoc<Schema>,
   key: K,
-): Schema[K] extends LoroMap<infer T> ? ObservableLoroMap<T> : never;
-export function getMap<T extends Record<string, unknown>>(
-  doc: LoroDoc,
-  key: string,
-): ObservableLoroMap<T>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getMap(doc: LoroDoc, key: string): ObservableLoroMap<any> {
+): Schema[K] extends LoroMap<infer T>
+  ? ObservableLoroMap<T>
+  : ObservableLoroMap {
   const pool = getPool(doc);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return pool.get(doc.getMap(key)) as ObservableLoroMap<any>;
+  return pool.get(doc.getMap(key)) as any;
 }
 
 /**
@@ -58,20 +55,16 @@ export function getMap(doc: LoroDoc, key: string): ObservableLoroMap<any> {
  */
 export function getList<
   Schema extends Record<string, Container>,
-  K extends keyof Schema & string,
+  K extends keyof Schema | ContainerID,
 >(
   doc: LoroDoc<Schema>,
   key: K,
-): Schema[K] extends LoroList<infer T> ? ObservableLoroList<T> : never;
-export function getList<T = unknown>(
-  doc: LoroDoc,
-  key: string,
-): ObservableLoroList<T>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getList(doc: LoroDoc, key: string): ObservableLoroList<any> {
+): Schema[K] extends LoroList<infer T>
+  ? ObservableLoroList<T>
+  : ObservableLoroList {
   const pool = getPool(doc);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return pool.get(doc.getList(key)) as ObservableLoroList<any>;
+  return pool.get(doc.getList(key)) as any;
 }
 
 /**
@@ -80,20 +73,16 @@ export function getList(doc: LoroDoc, key: string): ObservableLoroList<any> {
  */
 export function getTree<
   Schema extends Record<string, Container>,
-  K extends keyof Schema & string,
+  K extends keyof Schema | ContainerID,
 >(
   doc: LoroDoc<Schema>,
   key: K,
-): Schema[K] extends LoroTree<infer T> ? ObservableLoroTree<T> : never;
-export function getTree<T extends Record<string, unknown>>(
-  doc: LoroDoc,
-  key: string,
-): ObservableLoroTree<T>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getTree(doc: LoroDoc, key: string): ObservableLoroTree<any> {
+): Schema[K] extends LoroTree<infer T>
+  ? ObservableLoroTree<T>
+  : ObservableLoroTree {
   const pool = getPool(doc);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return pool.get(doc.getTree(key)) as ObservableLoroTree<any>;
+  return pool.get(doc.getTree(key)) as any;
 }
 
 /**
@@ -102,40 +91,26 @@ export function getTree(doc: LoroDoc, key: string): ObservableLoroTree<any> {
  */
 export function getMovableList<
   Schema extends Record<string, Container>,
-  K extends keyof Schema & string,
+  K extends keyof Schema | ContainerID,
 >(
   doc: LoroDoc<Schema>,
   key: K,
 ): Schema[K] extends LoroMovableList<infer T>
   ? ObservableMovableList<T>
-  : never;
-export function getMovableList<T = unknown>(
-  doc: LoroDoc,
-  key: string,
-): ObservableMovableList<T>;
-export function getMovableList(
-  doc: LoroDoc,
-  key: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): ObservableMovableList<any> {
+  : ObservableMovableList {
   const pool = getPool(doc);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return pool.get(doc.getMovableList(key)) as ObservableMovableList<any>;
+  return pool.get(doc.getMovableList(key)) as any;
 }
 
 /**
  * Get an observable text from a document.
  * Automatically manages the pool internally and infers types from LoroDoc schema.
  */
-export function getText<
-  Schema extends Record<string, Container>,
-  K extends keyof Schema & string,
->(
-  doc: LoroDoc<Schema>,
-  key: K,
-): Schema[K] extends LoroText ? ObservableLoroText : never;
-export function getText(doc: LoroDoc, key: string): ObservableLoroText;
-export function getText(doc: LoroDoc, key: string): ObservableLoroText {
+export function getText(
+  doc: LoroDoc,
+  key: string | ContainerID,
+): ObservableLoroText {
   const pool = getPool(doc);
   return pool.get(doc.getText(key)) as ObservableLoroText;
 }
