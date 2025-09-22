@@ -1,6 +1,7 @@
 # @seanchas116/mobx-loro
 
 [![npm version](https://badge.fury.io/js/@seanchas116%2Fmobx-loro.svg)](https://badge.fury.io/js/@seanchas116%2Fmobx-loro)
+[![Tests](https://github.com/seanchas116/mobx-loro/actions/workflows/node.js.yml/badge.svg)](https://github.com/seanchas116/mobx-loro/actions/workflows/node.js.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [MobX](https://mobx.js.org/) wrappers for [Loro CRDT](https://loro.dev/) containers, enabling automatic UI updates when CRDT data changes.
